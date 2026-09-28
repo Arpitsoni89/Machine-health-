@@ -1,0 +1,37 @@
+{
+  "entities": {
+    "users": {
+      "title": "User Profiles",
+      "description": "Authenticated users and their plant operational roles",
+      "properties": {
+        "id": { "type": "string", "description": "Unique user ID (matches Firebase Auth UID)" },
+        "name": { "type": "string", "description": "User display name" },
+        "email": { "type": "string", "description": "User email" },
+        "avatar": { "type": "string", "description": "User avatar URL" },
+        "role": { "type": "string", "description": "Operational role in the plant" },
+        "facility": { "type": "string", "description": "Assigned industrial plant/facility" },
+        "provider": { "type": "string", "description": "Authentication provider" },
+        "loginTime": { "type": "string", "description": "Last sign-in timestamp" }
+      },
+      "required": ["id", "email", "name"]
+    },
+    "maintenance_alerts": {
+      "title": "Maintenance Alerts",
+      "description": "Real-time edge sensor alerts and anomaly notifications",
+      "properties": {
+        "id": { "type": "string", "description": "Unique alert ID" },
+        "machineId": { "type": "string", "description": "Associated machine ID" },
+        "machineName": { "type": "string", "description": "Machine name" },
+        "severity": { "type": "string", "description": "critical or warning" },
+        "metric": { "type": "string", "description": "vibration, temperature, power" },
+        "value": { "type": "string", "description": "Telemetry sensor reading" },
+        "threshold": { "type": "string", "description": "Threshold limit" },
+        "message": { "type": "string", "description": "Diagnostic message" },
+        "timestamp": { "type": "string", "description": "Alert creation timestamp" },
+        "acknowledged": { "type": "boolean", "description": "Whether acknowledged" },
+        "assignedTo": { "type": "string", "description": "Assigned technician name" }
+      },
+      "required": ["id", "machineId", "severity", "timestamp"]
+    }
+  }
+}

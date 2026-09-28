@@ -1,0 +1,204 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-main: #f8fafc;
+    --bg-card: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --border-color: #e2e8f0;
+    
+    /* Default Cyan Bright Theme tokens */
+    --theme-accent: #0284c7;
+    --theme-accent-light: #f0f9ff;
+    --theme-accent-border: #bae6fd;
+    --theme-accent-glow: rgba(2, 132, 199, 0.15);
+  }
+
+  :root[data-bright-theme="emerald"] {
+    --theme-accent: #059669;
+    --theme-accent-light: #ecfdf5;
+    --theme-accent-border: #a7f3d0;
+    --theme-accent-glow: rgba(5, 150, 105, 0.15);
+  }
+
+  :root[data-bright-theme="amber"] {
+    --theme-accent: #d97706;
+    --theme-accent-light: #fffbeb;
+    --theme-accent-border: #fde68a;
+    --theme-accent-glow: rgba(217, 119, 6, 0.15);
+  }
+
+  :root[data-bright-theme="violet"] {
+    --theme-accent: #7c3aed;
+    --theme-accent-light: #f5f3ff;
+    --theme-accent-border: #ddd6fe;
+    --theme-accent-glow: rgba(124, 58, 237, 0.15);
+  }
+
+  :root[data-bright-theme="coral"] {
+    --theme-accent: #e11d48;
+    --theme-accent-light: #fff1f2;
+    --theme-accent-border: #fecdd3;
+    --theme-accent-glow: rgba(225, 29, 72, 0.15);
+  }
+
+  /* Bright Background Styles */
+  :root[data-bg-style="pure-white"] body {
+    background-color: #ffffff;
+    background-image: 
+      radial-gradient(at 10% 10%, rgba(2, 132, 199, 0.05) 0px, transparent 50%),
+      radial-gradient(at 90% 90%, rgba(16, 185, 129, 0.04) 0px, transparent 50%);
+  }
+
+  :root[data-bg-style="warm-solar"] body {
+    background-color: #fffdf9;
+    background-image: 
+      radial-gradient(at 0% 0%, #fff7ed 0px, transparent 60%),
+      radial-gradient(at 100% 50%, #fef3c7 0px, transparent 60%),
+      radial-gradient(at 50% 100%, #fffbeb 0px, transparent 70%);
+  }
+
+  :root[data-bg-style="fresh-mint"] body {
+    background-color: #f7fee7;
+    background-image: 
+      radial-gradient(at 10% 20%, #ecfdf5 0px, transparent 60%),
+      radial-gradient(at 90% 80%, #f0fdf4 0px, transparent 60%),
+      radial-gradient(at 50% 0%, #dcfce7 0px, transparent 60%);
+  }
+
+  :root[data-bg-style="electric-sky"] body {
+    background-color: #f0f9ff;
+    background-image: 
+      radial-gradient(at 0% 0%, #e0f2fe 0px, transparent 60%),
+      radial-gradient(at 100% 20%, #bae6fd 0px, transparent 50%),
+      radial-gradient(at 50% 100%, #e0f7fa 0px, transparent 70%);
+  }
+
+  :root[data-bg-style="soft-silver"] body {
+    background-color: #f8fafc;
+    background-image: 
+      radial-gradient(at 20% 10%, #f1f5f9 0px, transparent 60%),
+      radial-gradient(at 80% 90%, #e2e8f0 0px, transparent 50%);
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Plus Jakarta Sans", system-ui, sans-serif;
+    min-height: 100vh;
+    transition: background-color 0.25s ease, color 0.25s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+}
+
+/* Mobile Touch & Safe Area Support */
+.pb-safe {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0.75rem));
+}
+
+.pt-safe {
+  padding-top: max(0.5rem, env(safe-area-inset-top, 0.5rem));
+}
+
+/* Touch-friendly range slider styling for iOS & Android */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #e2e8f0;
+  border-radius: 9999px;
+  height: 8px;
+  touch-action: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--theme-accent, #0284c7);
+  border: 3px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+input[type="range"]:active::-webkit-slider-thumb {
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--theme-accent, #0284c7);
+  border: 3px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+  cursor: pointer;
+}
+
+/* Hide scrollbar for clean horizontal mobile filter carousels while allowing swipe */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Bright ambient radial glow */
+.bright-glow {
+  background-image: radial-gradient(circle at 50% 0%, var(--theme-accent-glow) 0%, transparent 70%);
+}
+
+/* Subtle crisp clean industrial grid for light surfaces */
+.bg-grid-industrial {
+  background-size: 28px 28px;
+  background-image: 
+    linear-gradient(to right, rgba(148, 163, 184, 0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.12) 1px, transparent 1px);
+}
+
+.bg-grid-dots {
+  background-size: 20px 20px;
+  background-image: radial-gradient(circle, rgba(148, 163, 184, 0.2) 1px, transparent 1px);
+}
+
+/* Smooth custom light scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Subtle pulse keyframe animation for high-priority alert notification */
+@keyframes subtle-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+    filter: drop-shadow(0 0 0px rgba(244, 63, 94, 0));
+  }
+  50% {
+    transform: scale(1.18);
+    opacity: 0.88;
+    filter: drop-shadow(0 0 6px rgba(244, 63, 94, 0.5));
+  }
+}
+
+.animate-subtle-pulse {
+  animation: subtle-pulse 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
