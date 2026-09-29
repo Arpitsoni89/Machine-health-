@@ -28,8 +28,8 @@ const PLANS: SubscriptionPlan[] = [
     name: 'Starter Pilot',
     tagline: 'Perfect for small Indian MSME workshops testing smart predictive care on 1 to 5 machines',
     forAudience: '1–5 Critical Machines',
-    monthlyPrice: 9999,
-    annualPricePerMonth: 8499,
+    monthlyPrice: 6999,
+    annualPricePerMonth: 5599,
     machineLimit: 5,
     features: [
       '1-Year Sensor Hardware Warranty & Diagnostic Self-Test Ping',
@@ -367,8 +367,8 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
         </div>
       </div>
 
-      {/* Subscription Pricing Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Subscription Pricing Grid - Optimized for PC Multi-Column, Tablet, and Mobile Stacking */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6">
         {PLANS.map((plan) => {
           const isCurrent = plan.id === currentPlanId;
           const displayPrice = billingCycle === 'annual' ? plan.annualPricePerMonth : plan.monthlyPrice;
@@ -376,7 +376,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
           return (
             <div
               key={plan.id}
-              className={`relative rounded-3xl p-6 sm:p-7 flex flex-col justify-between transition-all duration-200 ${
+              className={`relative rounded-3xl p-5 sm:p-6 lg:p-7 flex flex-col justify-between transition-all duration-200 ${
                 isCurrent
                   ? `bg-white border-2 ${themeConfig.borderClass} shadow-md`
                   : plan.isPopular
@@ -416,7 +416,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                     </span>
                   </div>
                   <p className="text-xs text-slate-500 mt-1">
-                    {billingCycle === 'annual' ? 'Billed annually (₹' + (displayPrice * 12).toLocaleString('en-IN') + '/yr + GST)' : 'Billed monthly (+ 18% GST)'}
+                    {billingCycle === 'annual' ? 'Billed annually (₹' + (displayPrice * 12).toLocaleString('en-IN') + '/yr + 18% GST)' : 'Billed monthly (No 18% GST / Zero GST)'}
                   </p>
                 </div>
 

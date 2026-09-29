@@ -74,6 +74,48 @@ function MachineMindApp() {
     return () => unsubscribe();
   }, []);
 
+  // Desktop PC Keyboard Navigation Shortcuts (1-5 for tabs, 'A' for alerts, Escape for modals)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't intercept when user is typing in forms/inputs
+      const activeEl = document.activeElement;
+      const isInput = activeEl && (
+        activeEl.tagName === 'INPUT' ||
+        activeEl.tagName === 'TEXTAREA' ||
+        activeEl.tagName === 'SELECT' ||
+        (activeEl as HTMLElement).isContentEditable
+      );
+
+      if (isInput) return;
+
+      if (e.key === '1') {
+        setActiveTab('telemetry');
+        soundFx.playTabClick();
+      } else if (e.key === '2') {
+        setActiveTab('fleet');
+        soundFx.playTabClick();
+      } else if (e.key === '3') {
+        setActiveTab('roi');
+        soundFx.playTabClick();
+      } else if (e.key === '4') {
+        setActiveTab('subscription');
+        soundFx.playTabClick();
+      } else if (e.key === '5') {
+        setActiveTab('help');
+        soundFx.playTabClick();
+      } else if (e.key === 'a' || e.key === 'A') {
+        setIsAlertsOpen((prev) => !prev);
+      } else if (e.key === 'Escape') {
+        setIsAlertsOpen(false);
+        setIsGuideOpen(false);
+        setIsOwnerNoticeModalOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const selectedMachine = machines.find((m) => m.id === selectedMachineId) || machines[0];
 
   const handleAddAlert = (newAlert: MaintenanceAlert) => {
@@ -372,8 +414,8 @@ function MachineMindApp() {
         </div>
       )}
 
-      {/* Main App Content Viewport */}
-      <main className="flex-1 max-w-7xl 2xl:max-w-[1536px] w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 pb-28 sm:pb-32">
+      {/* Main App Content Viewport - Optimized for PC Widescreen & Mobile Safe Viewports */}
+      <main className="flex-1 max-w-7xl 2xl:max-w-[1600px] w-full mx-auto px-3 sm:px-6 lg:px-8 2xl:px-10 py-4 sm:py-7 lg:py-8 pb-28 sm:pb-32">
         {activeTab === 'telemetry' && (
           <LiveTelemetryDashboard
             machines={machines}

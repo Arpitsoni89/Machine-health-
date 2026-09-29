@@ -99,10 +99,10 @@ export const RoiCalculatorView: React.FC = () => {
           </button>
         </div>
 
-        {/* Sliders and Metrics */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-6">
+        {/* Sliders and Metrics - Optimized for Tablet/PC Multi-Column and Mobile Single Column */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 mt-6">
           {/* Controls */}
-          <div className="lg:col-span-6 space-y-6">
+          <div className="md:col-span-6 space-y-6">
             <div>
               <div className="flex justify-between text-xs font-semibold mb-2">
                 <span className="text-slate-700">How many machines in your plant?</span>
@@ -154,7 +154,7 @@ export const RoiCalculatorView: React.FC = () => {
           </div>
 
           {/* Results Summary Box */}
-          <div className="lg:col-span-6 rounded-3xl bg-slate-50 border border-slate-200 p-6 sm:p-7 flex flex-col justify-between shadow-xs">
+          <div className="md:col-span-6 rounded-3xl bg-slate-50 border border-slate-200 p-6 sm:p-7 flex flex-col justify-between shadow-xs">
             <div>
               <div className="flex items-center justify-between pb-3 border-b border-slate-200 text-xs">
                 <span className="text-slate-500">Money currently lost to sudden breakdowns:</span>

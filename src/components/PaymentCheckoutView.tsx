@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import QRCode from 'qrcode';
 import { 
   CreditCard, 
   ShieldCheck, 
@@ -11,6 +12,7 @@ import {
   Download, 
   Sparkles, 
   Check, 
+  Copy,
   AlertCircle,
   Clock,
   Radio,
@@ -68,9 +70,11 @@ export const PaymentCheckoutView: React.FC<PaymentCheckoutViewProps> = ({
   const [cardCvv, setCardCvv] = useState('842');
   const [saveCard, setSaveCard] = useState(true);
 
-  // UPI State
+  // UPI & Real QR Code State
   const [upiId, setUpiId] = useState(user?.email ? `${user.email.split('@')[0]}@okaxis` : 'plantops998@okaxis');
   const [selectedUpiApp, setSelectedUpiApp] = useState<'gpay' | 'phonepe' | 'paytm' | 'bhim'>('gpay');
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
+  const [copiedVpa, setCopiedVpa] = useState<boolean>(false);
 
   // Netbanking State
   const [selectedBank, setSelectedBank] = useState('hdfc');
@@ -83,9 +87,49 @@ export const PaymentCheckoutView: React.FC<PaymentCheckoutViewProps> = ({
   // Pricing calculations
   const pricePerMonth = billingCycle === 'annual' ? plan.annualPricePerMonth : plan.monthlyPrice;
   const subtotal = billingCycle === 'annual' ? pricePerMonth * 12 : pricePerMonth;
-  const gstRate = 0.18; // 18% GST standard for B2B industrial SaaS
+  // 18% GST removed for monthly billing (GST = 0 on monthly billing)
+  const gstRate = billingCycle === 'monthly' ? 0 : 0.18;
   const gstAmount = Math.round(subtotal * gstRate);
   const totalAmount = subtotal + gstAmount;
+
+  // Real UPI Payment Intent Scheme (NPCI / UPI 2.0 Standard)
+  const payeeVpa = 'machinemind.billing@icici';
+  const payeeName = 'MachineMind Reliability Sensors';
+  const transactionNote = `${plan.name} Subscription (${billingCycle === 'annual' ? 'Annual' : 'Monthly'})`;
+
+  const upiPaymentUri = useMemo(() => {
+    return `upi://pay?pa=${encodeURIComponent(payeeVpa)}&pn=${encodeURIComponent(payeeName)}&am=${totalAmount.toFixed(2)}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+  }, [totalAmount, plan.name, billingCycle]);
+
+  // Generate real scannable QR code whenever amount or plan changes
+  useEffect(() => {
+    let isMounted = true;
+    QRCode.toDataURL(upiPaymentUri, {
+      width: 320,
+      margin: 1.5,
+      color: {
+        dark: '#0f172a',
+        light: '#ffffff',
+      },
+      errorCorrectionLevel: 'M',
+    })
+      .then((url) => {
+        if (isMounted) setQrCodeDataUrl(url);
+      })
+      .catch((err) => {
+        console.error('Failed to generate UPI QR code:', err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [upiPaymentUri]);
+
+  const handleCopyVpa = () => {
+    navigator.clipboard.writeText(payeeVpa);
+    setCopiedVpa(true);
+    setTimeout(() => setCopiedVpa(false), 2000);
+  };
 
   const handlePayNow = () => {
     setIsProcessing(true);
@@ -159,9 +203,9 @@ export const PaymentCheckoutView: React.FC<PaymentCheckoutViewProps> = ({
       },
       itemDescription: `MachineMind Predictive Maintenance Platform - ${paymentSuccessReceipt.planName} Plan (${paymentSuccessReceipt.billingCycle === 'annual' ? '12 Months Annual' : '1 Month'})`,
       quota: plan.machineLimit === 'Unlimited' ? 'Unlimited Plant Machinery' : `Up to ${plan.machineLimit} Industrial Assets`,
-      subtotalUSD: `$${subtotal.toLocaleString()}`,
-      gstUSD: `$${gstAmount.toLocaleString()}`,
-      totalPaidUSD: `$${paymentSuccessReceipt.amount.toLocaleString()}`,
+      subtotalINR: `₹${subtotal.toLocaleString('en-IN')}`,
+      gstINR: billingCycle === 'monthly' ? '₹0 (0% GST / Waived)' : `₹${gstAmount.toLocaleString('en-IN')}`,
+      totalPaidINR: `₹${paymentSuccessReceipt.amount.toLocaleString('en-IN')}`,
       paymentMethod: paymentSuccessReceipt.paymentMethod,
       status: 'PAID - ELECTRONIC SIGNATURE VERIFIED',
     };
@@ -180,7 +224,7 @@ export const PaymentCheckoutView: React.FC<PaymentCheckoutViewProps> = ({
   // SUCCESS SCREEN
   if (paymentSuccessReceipt) {
     return (
-      <div className="max-w-3xl mx-auto py-6 animate-in zoom-in-95 duration-200">
+      <div className="max-w-3xl mx-auto py-6 pb-28 sm:pb-14 animate-in zoom-in-95 duration-200">
         <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-10 shadow-xl text-center space-y-6">
           {/* Animated Success Ring */}
           <div className="w-20 h-20 rounded-full bg-emerald-100 border-4 border-emerald-200 mx-auto flex items-center justify-center text-emerald-600 shadow-lg animate-bounce">
@@ -270,7 +314,7 @@ export const PaymentCheckoutView: React.FC<PaymentCheckoutViewProps> = ({
 
   // PAYMENT CHECKOUT FORM SCREEN
   return (
-    <div className="max-w-5xl mx-auto space-y-6 animate-in fade-in duration-200">
+    <div className="max-w-5xl mx-auto space-y-6 pb-28 sm:pb-16 animate-in fade-in duration-200">
       {/* Top Breadcrumb / Return button */}
       <div className="flex items-center justify-between">
         <button
@@ -287,9 +331,9 @@ export const PaymentCheckoutView: React.FC<PaymentCheckoutViewProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column (7 Cols): Payment Methods & Billing Form */}
-        <div className="lg:col-span-7 space-y-5">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-5 lg:gap-6 items-start">
+        {/* Left Column (7 Cols on PC/Tablet, 1 Col on Mobile): Payment Methods & Billing Form */}
+        <div className="md:col-span-7 space-y-5">
           {/* Payment Method Selector */}
           <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs space-y-5">
             <div>
@@ -437,55 +481,150 @@ export const PaymentCheckoutView: React.FC<PaymentCheckoutViewProps> = ({
               </div>
             )}
 
-            {/* TAB 2: UPI / QR CODE */}
+            {/* TAB 2: UPI / REAL SCANNABLE QR CODE */}
             {paymentMethod === 'upi' && (
               <div className="space-y-4 pt-2 border-t border-slate-100 animate-in fade-in duration-150">
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-center gap-4">
-                  {/* Mock Industrial UPI QR Code */}
-                  <div className="p-3 bg-white rounded-2xl border border-slate-200 shadow-2xs shrink-0 text-center">
-                    <div className="w-28 h-28 bg-slate-900 p-2 rounded-xl flex items-center justify-center text-white font-mono text-[9px] relative overflow-hidden">
-                      <div className="absolute inset-2 border-2 border-white/40 flex flex-col items-center justify-center">
-                        <QrCode className="w-14 h-14 text-white" />
-                        <span className="text-[8px] font-bold text-emerald-400 mt-1">SCAN & PAY</span>
-                      </div>
+                <div className="p-4 sm:p-5 rounded-3xl bg-slate-50 border border-slate-200 flex flex-col md:flex-row items-center gap-5">
+                  {/* Real Scannable UPI QR Code Card */}
+                  <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm text-center shrink-0 flex flex-col items-center">
+                    <div className="w-44 h-44 sm:w-48 sm:h-48 bg-white rounded-xl flex items-center justify-center relative overflow-hidden p-1 border border-slate-100">
+                      {qrCodeDataUrl ? (
+                        <img 
+                          src={qrCodeDataUrl} 
+                          alt={`Scan UPI QR Code to pay ₹${totalAmount.toLocaleString('en-IN')}`} 
+                          className="w-full h-full object-contain rounded-lg"
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center text-slate-400 gap-2">
+                          <div className="w-8 h-8 border-2 border-sky-500 border-t-transparent rounded-full animate-spin" />
+                          <span className="text-[10px] font-mono">Generating UPI QR...</span>
+                        </div>
+                      )}
                     </div>
-                    <span className="text-[10px] text-slate-500 font-mono mt-1 block">MachineMind UPI</span>
+                    
+                    {/* QR Caption & Live Amount */}
+                    <div className="mt-2.5 space-y-1 w-full">
+                      <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-slate-900 font-mono">
+                        <span>₹{totalAmount.toLocaleString('en-IN')} INR</span>
+                      </div>
+                      <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                        Scan with Any UPI App
+                      </span>
+                    </div>
                   </div>
 
-                  <div className="space-y-2 text-xs flex-1">
-                    <span className="font-bold text-slate-900 block">
-                      Instant App Payment or Virtual Payment Address (VPA):
-                    </span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {[
-                        { id: 'gpay', label: 'Google Pay' },
-                        { id: 'phonepe', label: 'PhonePe' },
-                        { id: 'paytm', label: 'Paytm' },
-                        { id: 'bhim', label: 'BHIM UPI' },
-                      ].map((app) => (
-                        <button
-                          key={app.id}
-                          type="button"
-                          onClick={() => setSelectedUpiApp(app.id as any)}
-                          className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition cursor-pointer ${
-                            selectedUpiApp === app.id
-                              ? 'bg-slate-900 text-white'
-                              : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
-                          }`}
-                        >
-                          {app.label}
-                        </button>
-                      ))}
+                  {/* QR Details, Apps & Verification */}
+                  <div className="space-y-3 text-xs flex-1 w-full">
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-slate-900 block text-sm">
+                          Real UPI QR Code
+                        </span>
+                        <span className="text-[10px] font-mono font-bold text-sky-700 bg-sky-50 border border-sky-200 px-2 py-0.5 rounded-md flex items-center gap-1">
+                          <QrCode className="w-3 h-3 text-sky-600" />
+                          NPCI / UPI 2.0
+                        </span>
+                      </div>
+                      <p className="text-slate-500 text-[11px] mt-0.5">
+                        Open Google Pay, PhonePe, Paytm, or BHIM on your phone and point the camera at this QR code.
+                      </p>
                     </div>
 
+                    {/* Verified Payee VPA Box with 1-Click Copy */}
+                    <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1.5 shadow-2xs">
+                      <div className="flex items-center justify-between text-[11px] text-slate-500">
+                        <span>Official Merchant VPA:</span>
+                        <span className="font-semibold text-emerald-600 flex items-center gap-1">
+                          <ShieldCheck className="w-3 h-3" /> Verified Merchant
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between gap-2">
+                        <code className="font-mono font-bold text-slate-900 text-xs sm:text-sm bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200/80 truncate">
+                          {payeeVpa}
+                        </code>
+                        <button
+                          type="button"
+                          onClick={handleCopyVpa}
+                          className="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1 transition shrink-0 cursor-pointer active:scale-95"
+                          title="Copy UPI ID"
+                        >
+                          {copiedVpa ? (
+                            <>
+                              <Check className="w-3.5 h-3.5 text-emerald-600" />
+                              <span className="text-emerald-700 font-bold">Copied</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5 text-slate-500" />
+                              <span>Copy ID</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Supported UPI Apps */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-700">
+                          Direct Mobile App Payment:
+                        </span>
+                        <span className="text-[10px] text-sky-600 font-semibold sm:hidden">
+                          No camera scan needed
+                        </span>
+                      </div>
+
+                      {/* Primary Mobile CTA Button */}
+                      <a
+                        href={upiPaymentUri}
+                        className="w-full min-h-[46px] py-2.5 px-4 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-700 hover:to-cyan-700 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-xs transition active:scale-98 cursor-pointer"
+                      >
+                        <Smartphone className="w-4 h-4 text-white" />
+                        <span>Tap to Pay with Google Pay / PhonePe</span>
+                        <ExternalLink className="w-3.5 h-3.5 text-sky-200" />
+                      </a>
+
+                      {/* 4 App Chips Grid */}
+                      <div className="grid grid-cols-4 gap-1.5 pt-0.5">
+                        {[
+                          { id: 'gpay', label: 'GPay' },
+                          { id: 'phonepe', label: 'PhonePe' },
+                          { id: 'paytm', label: 'Paytm' },
+                          { id: 'bhim', label: 'BHIM' },
+                        ].map((app) => (
+                          <a
+                            key={app.id}
+                            href={upiPaymentUri}
+                            className="py-2 px-1 rounded-xl bg-white border border-slate-200 hover:border-slate-300 text-slate-700 font-bold text-[11px] flex items-center justify-center transition shadow-2xs hover:bg-slate-50 cursor-pointer text-center active:scale-95"
+                          >
+                            <span>{app.label}</span>
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Manual VPA input for request-money flow */}
                     <div className="pt-1">
-                      <input
-                        type="text"
-                        value={upiId}
-                        onChange={(e) => setUpiId(e.target.value)}
-                        placeholder="yourname@upi"
-                        className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-mono text-slate-900 focus:outline-hidden focus:border-sky-500"
-                      />
+                      <label className="text-[11px] font-medium text-slate-600 block mb-1">
+                        Or enter your VPA to receive a collect request:
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={upiId}
+                          onChange={(e) => setUpiId(e.target.value)}
+                          placeholder="yourname@okaxis"
+                          className="flex-1 px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-mono text-slate-900 focus:outline-hidden focus:border-sky-500 shadow-2xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={handlePayNow}
+                          className="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition shadow-xs cursor-pointer active:scale-95"
+                        >
+                          Send Collect Request
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -591,8 +730,8 @@ export const PaymentCheckoutView: React.FC<PaymentCheckoutViewProps> = ({
           </div>
         </div>
 
-        {/* Right Column (5 Cols): Order Summary & Sticky Pay CTA */}
-        <div className="lg:col-span-5 space-y-4">
+        {/* Right Column (5 Cols on PC/Tablet, 1 Col on Mobile): Order Summary & Sticky Pay CTA */}
+        <div className="md:col-span-5 space-y-4">
           <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-md space-y-5 sticky top-24">
             <div className="flex items-center justify-between pb-4 border-b border-slate-100">
               <div>
@@ -639,8 +778,8 @@ export const PaymentCheckoutView: React.FC<PaymentCheckoutViewProps> = ({
                 <span>₹{subtotal.toLocaleString('en-IN')} INR</span>
               </div>
               <div className="flex items-center justify-between text-slate-600">
-                <span>18% Industrial GST</span>
-                <span>₹{gstAmount.toLocaleString('en-IN')} INR</span>
+                <span>{billingCycle === 'monthly' ? 'GST (Monthly Offer)' : '18% Industrial GST'}</span>
+                <span>{billingCycle === 'monthly' ? '₹0 INR (0% GST / Waived)' : `₹${gstAmount.toLocaleString('en-IN')} INR`}</span>
               </div>
               <div className="flex items-center justify-between text-slate-500 text-[11px]">
                 <span>Cloud & Edge Gateway Bandwidth</span>

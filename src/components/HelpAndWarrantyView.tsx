@@ -448,9 +448,9 @@ For specific guidelines, you can also ask: *"What does the 3-Year Sensor Warrant
 
       {/* Main Content Area based on Active Tab */}
       {activeTab === 'warranty' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left Column: Sensor Inventory & Search */}
-          <div className="lg:col-span-5 bg-white border border-slate-200 rounded-3xl p-5 shadow-xs space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-5 lg:gap-6">
+          {/* Left Column (5 Cols on PC/Tablet, 1 Col on Mobile): Sensor Inventory & Search */}
+          <div className="md:col-span-5 bg-white border border-slate-200 rounded-3xl p-5 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold text-slate-900">Installed Plant Sensors</h3>
@@ -543,8 +543,8 @@ For specific guidelines, you can also ask: *"What does the 3-Year Sensor Warrant
             </div>
           </div>
 
-          {/* Right Column: Selected Sensor Warranty Details & Actions */}
-          <div className="lg:col-span-7 bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 shadow-xs space-y-6">
+          {/* Right Column (7 Cols on PC/Tablet, 1 Col on Mobile): Selected Sensor Warranty Details & Actions */}
+          <div className="md:col-span-7 bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 shadow-xs space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
               <div>
                 <div className="flex items-center gap-2">
