@@ -115,7 +115,7 @@ export const RoiCalculatorView: React.FC = () => {
                 step="5"
                 value={machineCount}
                 onChange={(e) => setMachineCount(Number(e.target.value))}
-                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-600"
+                className="w-full h-3 sm:h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-600 touch-manipulation my-1"
               />
             </div>
 
@@ -131,7 +131,7 @@ export const RoiCalculatorView: React.FC = () => {
                 step="25000"
                 value={hourlyDowntimeCostINR}
                 onChange={(e) => setHourlyDowntimeCostINR(Number(e.target.value))}
-                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-600"
+                className="w-full h-3 sm:h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-600 touch-manipulation my-1"
               />
               <span className="text-[11px] text-slate-500 mt-1 block">Includes idle workers, wasted materials, and missed customer deadlines.</span>
             </div>
@@ -148,7 +148,7 @@ export const RoiCalculatorView: React.FC = () => {
                 step="5"
                 value={breakdownHoursPerYear}
                 onChange={(e) => setBreakdownHoursPerYear(Number(e.target.value))}
-                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-600"
+                className="w-full h-3 sm:h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-600 touch-manipulation my-1"
               />
             </div>
           </div>
@@ -207,8 +207,12 @@ export const RoiCalculatorView: React.FC = () => {
           </p>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs sm:text-sm">
+        <span className="sm:hidden text-[11px] font-semibold text-sky-600 bg-sky-50 border border-sky-200/80 px-2.5 py-1 rounded-lg inline-block mb-3">
+          ← Swipe table horizontally to compare →
+        </span>
+
+        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+          <table className="w-full min-w-[540px] text-left text-xs sm:text-sm">
             <thead>
               <tr className="border-b border-slate-200 text-slate-500">
                 <th className="py-3 px-4 uppercase tracking-wider font-semibold">What Happens</th>

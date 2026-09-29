@@ -28,8 +28,8 @@ const PLANS: SubscriptionPlan[] = [
     name: 'Starter Pilot',
     tagline: 'Perfect for small Indian MSME workshops testing smart predictive care on 1 to 5 machines',
     forAudience: '1–5 Critical Machines',
-    monthlyPrice: 7999,
-    annualPricePerMonth: 6499,
+    monthlyPrice: 9999,
+    annualPricePerMonth: 8499,
     machineLimit: 5,
     features: [
       '1-Year Sensor Hardware Warranty & Diagnostic Self-Test Ping',
@@ -478,6 +478,13 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                     <span>Quick Switch to {plan.name}</span>
                   </button>
                 )}
+
+                {/* Plan Warranty Terms & Conditions */}
+                <div className="pt-2 text-center border-t border-slate-100/80">
+                  <p className="text-[10px] leading-tight text-slate-400">
+                    <span className="font-semibold text-slate-600">*Terms &amp; Conditions:</span> If any sensor is repaired by a third party, then warranty is void and is not replaceable by the company.
+                  </p>
+                </div>
               </div>
             </div>
           );
@@ -559,6 +566,12 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
               </tr>
             </tbody>
           </table>
+        </div>
+
+        {/* Matrix Terms & Conditions Footnote */}
+        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-[11px] text-slate-500">
+          <span className="font-semibold text-slate-700">*Warranty Policy:</span>
+          <span>If any sensor is repaired by a third party, then warranty is void and is not replaceable by the company.</span>
         </div>
       </div>
 
@@ -807,7 +820,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
 
               {(() => {
                 const baseMonthly = customMachineCount <= 5 
-                  ? 6499 
+                  ? 8499 
                   : customMachineCount <= 20 
                   ? 31999 
                   : 31999 + (customMachineCount - 20) * 1499;

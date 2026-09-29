@@ -687,6 +687,9 @@ export const PaymentCheckoutView: React.FC<PaymentCheckoutViewProps> = ({
                 <span>PCI-DSS Level-1 • TLS 1.3 • Instant Activation Guarantee</span>
               </div>
               <p>Cancel or upgrade anytime with prorated billing.</p>
+              <p className="text-[10px] text-slate-400 pt-1 border-t border-slate-100">
+                <span className="font-semibold text-slate-500">*Terms &amp; Conditions:</span> If any sensor is repaired by a third party, then warranty is void and is not replaceable by the company.
+              </p>
             </div>
           </div>
         </div>

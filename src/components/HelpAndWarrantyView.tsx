@@ -435,6 +435,17 @@ For specific guidelines, you can also ask: *"What does the 3-Year Sensor Warrant
         </div>
       </div>
 
+      {/* Official Hardware Warranty Terms & Conditions Banner */}
+      <div className="bg-amber-50/90 border border-amber-200/90 rounded-2xl p-4 sm:p-5 flex items-start gap-3.5 shadow-2xs">
+        <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+        <div className="text-xs text-amber-950 leading-relaxed">
+          <span className="font-bold text-amber-900 block text-sm mb-0.5">Official Sensor Hardware Warranty Terms &amp; Conditions:</span>
+          <span>
+            All MachineMind vibration, acoustic, and thermal sensors are hermetically factory-calibrated. <strong className="text-amber-900 font-bold">If any sensor is repaired or tampered with by an unauthorized third party, the warranty is void and the sensor is not replaceable by the company.</strong> To ensure unbroken compliance and ISO 17025 certification, always request advance replacement through the portal or contact our certified reliability engineering desk.
+          </span>
+        </div>
+      </div>
+
       {/* Main Content Area based on Active Tab */}
       {activeTab === 'warranty' ? (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

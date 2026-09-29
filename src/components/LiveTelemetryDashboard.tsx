@@ -336,8 +336,46 @@ export const LiveTelemetryDashboard: React.FC<LiveTelemetryDashboardProps> = ({
       />
 
       {/* 2. Machine Switcher & Big Traffic-Light Health Status */}
-      <div className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-xs transition-colors">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 pb-5 sm:pb-6 border-b border-slate-100">
+      <div className="bg-white border border-slate-200/90 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xs transition-colors">
+        {/* Mobile Fast Equipment Swipe Carousel */}
+        <div className="mb-4 pb-3 border-b border-slate-100 -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              Quick Switch Asset ({machines.length})
+            </span>
+            <span className="text-[11px] text-slate-500 font-medium">
+              Swipe to switch ➔
+            </span>
+          </div>
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 touch-manipulation">
+            {machines.map((m) => {
+              const isSelected = m.id === selectedMachineId;
+              const isCrit = m.status === 'critical';
+              const isWarn = m.status === 'warning';
+              return (
+                <button
+                  key={m.id}
+                  onClick={() => onSelectMachine(m.id)}
+                  className={`min-h-[40px] px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-150 flex items-center gap-2 shrink-0 cursor-pointer active:scale-95 ${
+                    isSelected
+                      ? `${themeConfig.bgLightClass} ${themeConfig.textClass} border ${themeConfig.borderClass} font-bold shadow-2xs ring-1 ring-slate-200`
+                      : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200/80'
+                  }`}
+                >
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${
+                    isCrit ? 'bg-rose-500 animate-pulse' : isWarn ? 'bg-amber-500' : 'bg-emerald-500'
+                  }`} />
+                  <span>{m.name}</span>
+                  <span className="text-[10px] font-mono text-slate-400">
+                    {m.tag.split('-')[1] || m.tag}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 pb-4 sm:pb-6 border-b border-slate-100">
           {/* Machine Info */}
           <div className="w-full lg:w-auto">
             <div className="flex items-center gap-2 text-xs text-slate-500 mb-1 flex-wrap">
@@ -361,6 +399,7 @@ export const LiveTelemetryDashboard: React.FC<LiveTelemetryDashboardProps> = ({
                 value={selectedMachineId}
                 onChange={(e) => onSelectMachine(e.target.value)}
                 className="w-full sm:w-auto min-h-[44px] px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-800 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-sky-500 transition shadow-2xs cursor-pointer"
+                aria-label="Select machinery asset"
               >
                 {machines.map((m) => (
                   <option key={m.id} value={m.id}>

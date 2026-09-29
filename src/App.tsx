@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { PlanProvider, usePlan } from './context/PlanContext';
 import { Navbar } from './components/Navbar';
+import { BottomNavBar } from './components/BottomNavBar';
 import { GoogleLoginModal } from './components/GoogleLoginModal';
 import { FriendlyGuideModal } from './components/FriendlyGuideModal';
 import { LiveTelemetryDashboard } from './components/LiveTelemetryDashboard';
@@ -372,7 +373,7 @@ function MachineMindApp() {
       )}
 
       {/* Main App Content Viewport */}
-      <main className="flex-1 max-w-7xl 2xl:max-w-[1536px] w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 pb-8 sm:pb-12">
+      <main className="flex-1 max-w-7xl 2xl:max-w-[1536px] w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 pb-28 sm:pb-32">
         {activeTab === 'telemetry' && (
           <LiveTelemetryDashboard
             machines={machines}
@@ -534,6 +535,15 @@ function MachineMindApp() {
           </div>
         </div>
       </footer>
+
+      {/* Fixed Bottom Navigation Bar Dock */}
+      <BottomNavBar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onOpenSearch={() => {
+          window.dispatchEvent(new CustomEvent('open-command-palette'));
+        }}
+      />
 
       {/* Offline Connectivity Indicator */}
       <OfflineIndicator />

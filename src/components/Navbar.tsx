@@ -109,8 +109,15 @@ export const Navbar: React.FC<NavbarProps> = ({
         }
       }
     };
+
+    const handleOpenPaletteEvent = () => setIsCommandPaletteOpen(true);
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('open-command-palette', handleOpenPaletteEvent);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('open-command-palette', handleOpenPaletteEvent);
+    };
   }, [setActiveTab]);
 
   // Detect when a new high-priority maintenance alert is added to alerts list
@@ -215,38 +222,22 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             </div>
 
-            {/* Center Segmented Navigation Links (Desktop) */}
-            <nav className="hidden lg:flex items-center gap-1 bg-slate-100/90 p-1 rounded-2xl border border-slate-200/80 shadow-2xs" aria-label="Desktop primary navigation">
-              {navItems.map((item, index) => {
-                const Icon = item.icon;
-                const isActive = activeTab === item.id;
-                const shortcutNum = index + 1;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => setActiveTab(item.id)}
-                    className={`group relative px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-150 flex items-center gap-1.5 cursor-pointer active:scale-95 ${
-                      isActive
-                        ? `bg-white ${themeConfig.textClass} shadow-xs font-bold border border-slate-200/60`
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
-                    }`}
-                    title={`${item.label} (Press ${shortcutNum} on keyboard)`}
-                  >
-                    <Icon className={`w-3.5 h-3.5 ${isActive ? themeConfig.textClass : 'text-slate-500'}`} />
-                    <span>{item.label}</span>
-                    {item.badge ? (
-                      <span className="px-1 py-0.2 rounded-md bg-emerald-100 text-emerald-800 text-[9px] font-extrabold uppercase tracking-wider">
-                        {item.badge}
-                      </span>
-                    ) : (
-                      <span className="hidden xl:inline text-[9px] font-mono text-slate-400 group-hover:text-slate-600 opacity-60">
-                        {shortcutNum}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
+            {/* Center Status / Plant Indicator (Desktop) */}
+            <div className="hidden lg:flex items-center gap-2.5 px-3 py-1.5 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-2xs text-xs">
+              <div className="flex items-center gap-1.5 font-semibold text-slate-800">
+                <Building2 className="w-3.5 h-3.5 text-slate-400" />
+                <span>Alwar Facility Alpha</span>
+              </div>
+              <span className="text-slate-300">·</span>
+              <div className="flex items-center gap-1.5 text-[11px] text-slate-600">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="font-mono font-medium">10Hz Stream Active</span>
+              </div>
+              <span className="text-slate-300">·</span>
+              <span className="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/80 text-[10px]">
+                99.98% SLA
+              </span>
+            </div>
 
             {/* Right Action Tools Cluster */}
             <div className="flex items-center gap-2">
@@ -452,49 +443,22 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          {/* Dedicated Mobile Horizontal Tab Navigation Strip (Quick 1-Thumb Switching) */}
-          <div className="lg:hidden flex items-center gap-1.5 overflow-x-auto no-scrollbar py-2 -mx-3 px-3 border-t border-slate-100 bg-slate-50/60 touch-manipulation">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    setActiveTab(item.id);
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className={`min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-150 flex items-center gap-1.5 shrink-0 cursor-pointer active:scale-95 ${
-                    isActive
-                      ? `bg-white ${themeConfig.textClass} shadow-2xs font-bold border border-slate-200`
-                      : 'text-slate-600 hover:text-slate-900 bg-white/70 border border-slate-200/50'
-                  }`}
-                >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? themeConfig.textClass : 'text-slate-500'}`} />
-                  <span>{item.label}</span>
-                  {item.badge && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Contextual Sub-Navigation Strip (Breadcrumbs & Telemetry Status) on Tablet/Desktop */}
-          <div className="hidden sm:flex items-center justify-between py-2 border-t border-slate-100 text-xs">
+          {/* Contextual Sub-Header Strip (Breadcrumbs & Telemetry Status) */}
+          <div className="flex items-center justify-between py-2 border-t border-slate-100 text-xs overflow-x-auto no-scrollbar">
             {/* Breadcrumb Navigation & Active Context */}
             <div className="flex items-center gap-2 text-slate-500 min-w-0">
               <span className="font-semibold text-slate-800 flex items-center gap-1.5 shrink-0">
                 <Building2 className="w-3.5 h-3.5 text-slate-400" />
-                Alwar Facility Alpha
+                <span className="hidden sm:inline">Alwar Facility Alpha</span>
+                <span className="sm:hidden">Alwar Alpha</span>
               </span>
               <ChevronRight className="w-3 h-3 text-slate-300 shrink-0" />
-              <span className="font-semibold text-slate-700 capitalize shrink-0">
-                {activeTab === 'telemetry' && 'Live Health Monitoring'}
-                {activeTab === 'fleet' && 'Plant Fleet Machinery'}
-                {activeTab === 'roi' && 'Value & Downtime Savings (₹)'}
-                {activeTab === 'subscription' && 'Subscription Plans (₹)'}
-                {activeTab === 'help' && 'Sensor Warranty & Help Assistant'}
+              <span className="font-semibold text-slate-700 capitalize shrink-0 truncate max-w-[140px] sm:max-w-none">
+                {activeTab === 'telemetry' && 'Live Health'}
+                {activeTab === 'fleet' && 'Fleet Machinery'}
+                {activeTab === 'roi' && 'Money Saved (₹)'}
+                {activeTab === 'subscription' && 'Plans & Pricing (₹)'}
+                {activeTab === 'help' && 'Warranty & Help'}
               </span>
 
               {/* Active Machine Pill if on Telemetry */}
@@ -510,7 +474,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
 
             {/* Industrial Real-Time Stream Status & PC Shortcut Hint */}
-            <div className="flex items-center gap-3 text-[11px] text-slate-500 shrink-0">
+            <div className="hidden sm:flex items-center gap-3 text-[11px] text-slate-500 shrink-0 ml-4">
               <span className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="font-mono text-slate-700 font-semibold">10Hz Stream Active</span>
@@ -520,10 +484,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span aria-hidden="true" className="text-slate-300">·</span>
               <span className="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/80">
                 99.98% SLA
-              </span>
-              <span aria-hidden="true" className="text-slate-300 hidden xl:inline">·</span>
-              <span className="text-[10px] text-slate-400 font-mono hidden xl:inline">
-                Press [1-5] to navigate
               </span>
             </div>
           </div>
